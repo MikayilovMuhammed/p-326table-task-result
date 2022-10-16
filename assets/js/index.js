@@ -137,10 +137,10 @@ const useValidations = () => {
     return isBreakValidation;
   };
 
-  const checkHasProductName = () => {
+  const checkHasProductName = (input) => {
     let hasProductName = inputValues.some(
       (item) =>
-        item.productName.toLowerCase() === inputs[0].value.trim().toLowerCase()
+        item.productName.toLowerCase() === input.value.trim().toLowerCase()
     );
 
     if (hasProductName) {
@@ -176,7 +176,7 @@ const useValidations = () => {
   };
 };
 
-const callAllValidations = () => {
+const callAllValidations = (input) => {
   const {
     checkIsEnteredProductInputs,
     checkHasProductName,
@@ -186,7 +186,7 @@ const callAllValidations = () => {
 
   if (
     checkIsEnteredProductInputs() ||
-    checkHasProductName() ||
+    checkHasProductName(input) ||
     checkPriceIsNumber() ||
     checkHasProductCategory()
   ) {
@@ -212,7 +212,7 @@ inputs.forEach((input) => {
 btn.addEventListener("click", (e) => {
   e.preventDefault();
 
-  if (callAllValidations()) {
+  if (callAllValidations(inputs[0])) {
     return;
   }
   showTable();
@@ -234,22 +234,27 @@ function changeProductName() {
   const { checkHasProductName } = useValidations();
   const itemInput = document.querySelectorAll(".item-input");
   const inputsInTable = document.querySelectorAll(".item-input input");
-  document
-    .querySelectorAll(".input-items")[0]
-    .addEventListener("click", function () {
+  const editBtnInTable = document.querySelectorAll(".item-input button");
+  document.querySelectorAll(".input-items").forEach((input, idx) => {
+    input.addEventListener("click", function () {
+      console.log(this);
       this.classList.add("d-none");
-      itemInput[0].classList.remove("d-none");
-      inputsInTable[0].value = this.innerText;
+      itemInput[idx].classList.remove("d-none");
+      inputsInTable[idx].value = this.innerText;
 
-      inputsInTable[0].onchange = (e) => {
-        if (checkHasProductName()) {
+      inputsInTable[idx].onchange = (e) => {
+        if (checkHasProductName(inputsInTable[idx])) {
           return;
         }
         this.innerText = e.target.value;
-        itemInput[0].classList.add("d-none");
+      };
+      editBtnInTable[idx].onclick = (e) => {
+        // e.stopProg
+        itemInput[idx].classList.add("d-none");
         this.classList.remove("d-none");
       };
     });
+  });
 }
 
 const showTable = () => {
@@ -293,8 +298,8 @@ const tbody = (inputValues) => {
             <tr>
                 <th scope="row">${number}</th>
                 <td><span class="input-items">${productName}</span> <span class="d-none item-input"><input type="text" class=""> <button class="btn btn-info">Edit</button></span></td>
-                <td><span class="input-items">${productPrice} AZN</span> <input type="text" class="d-none item-input"></td>
-                <td><span class="input-items">${productCategory}</span> <input type="text" class="d-none item-input"></td>
+                <td>${productPrice} AZN</td>
+                <td>${productCategory}</td>
             </tr>
           `;
       }
