@@ -150,6 +150,20 @@ const useValidations = () => {
     return false;
   };
 
+  const addProductCount = (input) => {
+    let hasProductName = inputValues.some(
+      (item) =>
+        item.productName.toLowerCase() === input.value.trim().toLowerCase()
+    );
+
+    if (hasProductName) {
+      alert(`Product already exist. Thats why add ${input.value} count`);
+      incrementProductCount();
+      return true;
+    }
+    return false;
+  };
+
   const checkPriceIsNumber = () => {
     if (isNaN(inputs[1].value)) {
       alert("Please enter only number");
@@ -173,22 +187,25 @@ const useValidations = () => {
     checkHasProductName,
     checkPriceIsNumber,
     checkHasProductCategory,
+    addProductCount,
   };
 };
 
 const callAllValidations = (input) => {
   const {
     checkIsEnteredProductInputs,
-    checkHasProductName,
+    // checkHasProductName,
+    addProductCount,
     checkPriceIsNumber,
     checkHasProductCategory,
   } = useValidations();
 
   if (
+    // checkHasProductName(input) || If without counter ||
     checkIsEnteredProductInputs() ||
-    checkHasProductName(input) ||
     checkPriceIsNumber() ||
-    checkHasProductCategory()
+    checkHasProductCategory() ||
+    addProductCount(input) // if with counter
   ) {
     return true;
   }
@@ -203,6 +220,7 @@ inputs.forEach((input) => {
     inputState = {
       ...inputState,
       number: inputValues.length + 1,
+      productCount: 1,
       [name]: value,
     };
   };
@@ -215,6 +233,7 @@ btn.addEventListener("click", (e) => {
   if (callAllValidations(inputs[0])) {
     return;
   }
+
   showTable();
   thead();
   tbody(inputValues);
@@ -237,7 +256,6 @@ function changeProductName() {
   const editBtnInTable = document.querySelectorAll(".item-input button");
   document.querySelectorAll(".input-items").forEach((input, idx) => {
     input.addEventListener("click", function () {
-      console.log(this);
       this.classList.add("d-none");
       itemInput[idx].classList.remove("d-none");
       inputsInTable[idx].value = this.innerText;
@@ -249,7 +267,6 @@ function changeProductName() {
         this.innerText = e.target.value;
       };
       editBtnInTable[idx].onclick = (e) => {
-        // e.stopProg
         itemInput[idx].classList.add("d-none");
         this.classList.remove("d-none");
       };
@@ -284,6 +301,7 @@ const thead = () => {
             <th scope="col">#</th>
             <th scope="col">Ad</th>
             <th scope="col">Qiymet</th>
+            <th scope="col">Say</th>
             <th scope="col">Kategoriya</th>
         </tr>
     </thead>
@@ -293,12 +311,16 @@ const thead = () => {
 const tbody = (inputValues) => {
   if (inputValues) {
     inputValues.forEach(
-      ({ number, productName, productPrice, productCategory }, idx) => {
+      (
+        { number, productName, productPrice, productCategory, productCount },
+        idx
+      ) => {
         table.innerHTML += `
             <tr>
                 <th scope="row">${number}</th>
                 <td><span class="input-items">${productName}</span> <span class="d-none item-input"><input type="text" class=""> <button class="btn btn-info">Edit</button></span></td>
                 <td>${productPrice} AZN</td>
+                <td class="product-count">${productCount} AZN</td>
                 <td>${productCategory}</td>
             </tr>
           `;
@@ -312,3 +334,10 @@ const tbody = (inputValues) => {
           `;
   }
 };
+
+function incrementProductCount() {
+  let productCount = Number(document.querySelector(".product-count").innerText);
+  productCount = isNaN(productCount) ? 1 : productCount;
+  productCount++;
+  document.querySelector(".product-count").innerText = productCount;
+}
