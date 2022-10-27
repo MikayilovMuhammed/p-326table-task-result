@@ -341,3 +341,10 @@ function incrementProductCount() {
   productCount++;
   document.querySelector(".product-count").innerText = productCount;
 }
+
+function incrementProductCountTwo() {
+  let productCount = Number(document.querySelector(".product-count").innerText);
+  productCount = isNaN(productCount) ? 1 : productCount;
+  productCount++;
+  document.querySelector(".product-count").innerText = productCount;
+}
